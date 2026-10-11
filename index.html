@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Leftover Rescue - a hyper-local marketplace for surplus food." />
+  <title>Leftover Rescue</title>
+  <style>
+    :root {
+      --green: #167a52;
+      --green-dark: #0e573a;
+      --mint: #eaf8f0;
+      --cream: #fffaf0;
+      --orange: #f28c28;
+      --red: #d95c5c;
+      --ink: #17312a;
+      --muted: #6b7c75;
+      --line: #dce9e2;
+      --card: #ffffff;
+      --shadow: 0 12px 35px rgba(23,49,42,.08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: #f6fbf8; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .app { min-height: 100vh; }
+    header { position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+    .nav { max-width: 1180px; margin: auto; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight: 900; font-size: 1.12rem; }
+    .brand-mark { width: 40px; height: 40px; border-radius: 13px; display:grid; place-items:center; background: var(--green); color:white; font-size: 1.35rem; }
+    .nav-links { display:flex; gap: 8px; }
+    .nav-links button, .ghost { border:0; background:transparent; padding:10px 13px; border-radius:10px; color:var(--ink); font-weight:700; }
+    .nav-links button:hover, .ghost:hover { background:var(--mint); }
+    .hero { max-width:1180px; margin:0 auto; padding:62px 22px 34px; display:grid; grid-template-columns:1.2fr .8fr; gap:35px; align-items:center; }
+    .pill { display:inline-flex; gap:8px; align-items:center; background:var(--mint); color:var(--green-dark); padding:8px 12px; border-radius:999px; font-size:.86rem; font-weight:800; }
+    h1 { font-size: clamp(2.35rem, 6vw, 4.8rem); line-height:.98; margin:18px 0; letter-spacing:-.055em; }
+    .hero p { color:var(--muted); font-size:1.08rem; max-width:620px; line-height:1.7; }
+    .actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:25px; }
+    .btn { border:0; border-radius:13px; padding:13px 17px; font-weight:850; transition:.2s; }
+    .btn:hover { transform:translateY(-1px); }
+    .primary { background:var(--green); color:white; box-shadow:0 8px 20px rgba(22,122,82,.2); }
+    .secondary { background:white; color:var(--green-dark); border:1px solid var(--line); }
+    .hero-card { background:linear-gradient(145deg,#eaf8f0,#fff7df); border:1px solid var(--line); border-radius:28px; padding:28px; box-shadow:var(--shadow); }
+    .hero-card h3 { margin-top:0; }
+    .impact { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:20px; }
+    .impact div { background:rgba(255,255,255,.8); padding:14px; border-radius:15px; text-align:center; }
+    .impact b { display:block; font-size:1.3rem; }
+    .section { max-width:1180px; margin:auto; padding:28px 22px 70px; }
+    .section-head { display:flex; justify-content:space-between; align-items:end; gap:15px; margin-bottom:20px; }
+    .section-head h2 { margin:0; font-size:2rem; letter-spacing:-.03em; }
+    .muted { color:var(--muted); }
+    .filters { display:flex; gap:9px; flex-wrap:wrap; margin:18px 0; }
+    .filters input, .filters select { border:1px solid var(--line); border-radius:11px; padding:11px 12px; background:white; color:var(--ink); }
+    .listings { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:18px; box-shadow:0 7px 24px rgba(23,49,42,.055); }
+    .card-top { display:flex; justify-content:space-between; gap:10px; }
+    .emoji { width:54px; height:54px; display:grid; place-items:center; background:var(--mint); border-radius:16px; font-size:1.7rem; }
+    .tag { font-size:.74rem; font-weight:850; color:var(--green-dark); background:var(--mint); padding:6px 9px; border-radius:999px; height:max-content; }
+    .card h3 { margin:14px 0 5px; }
+    .price { font-size:1.35rem; font-weight:900; color:var(--green); }
+    .old { text-decoration:line-through; color:var(--muted); font-size:.9rem; margin-left:7px; }
+    .meta { display:grid; gap:6px; color:var(--muted); font-size:.9rem; margin:12px 0 16px; }
+    .claim { width:100%; }
+    .empty { grid-column:1/-1; padding:40px; text-align:center; border:1px dashed var(--line); border-radius:18px; color:var(--muted); }
+    .modal-backdrop { position:fixed; inset:0; background:rgba(8,30,21,.42); display:none; align-items:center; justify-content:center; z-index:50; padding:18px; }
+    .modal-backdrop.open { display:flex; }
+    .modal { width:min(620px,100%); background:white; border-radius:24px; padding:24px; max-height:92vh; overflow:auto; }
+    .modal-head { display:flex; justify-content:space-between; align-items:center; }
+    .close { border:0; background:#eef5f1; width:38px; height:38px; border-radius:50%; }
+    form { display:grid; gap:12px; margin-top:18px; }
+    label { font-size:.86rem; font-weight:800; }
+    input, textarea, select { width:100%; border:1px solid var(--line); border-radius:12px; padding:12px; outline:none; background:#fff; }
+    textarea { min-height:90px; resize:vertical; }
+    .two { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    footer { background:#12372a; color:#dff3e9; padding:30px 22px; }
+    footer .inner { max-width:1180px; margin:auto; display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+    .toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px); opacity:0; pointer-events:none; background:#163e30; color:white; padding:12px 16px; border-radius:12px; z-index:100; transition:.25s; box-shadow:var(--shadow); }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    @media (max-width: 850px) {
+      .hero { grid-template-columns:1fr; padding-top:42px; }
+      .listings { grid-template-columns:repeat(2,1fr); }
+    }
+    @media (max-width: 590px) {
+      .nav-links button:nth-child(2) { display:none; }
+      .hero { padding-left:16px; padding-right:16px; }
+      .section { padding-left:16px; padding-right:16px; }
+      .listings { grid-template-columns:1fr; }
+      .two { grid-template-columns:1fr; }
+      h1 { font-size:2.8rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <nav class="nav">
+      <div class="brand"><div class="brand-mark">♻</div> Leftover Rescue</div>
+      <div class="nav-links">
+        <button onclick="scrollToId('browse')">Find food</button>
+        <button onclick="openModal()">List food</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <span class="pill">🌱 Save food • Save money • Meet your neighbours</span>
+        <h1>Good food deserves a second chance.</h1>
+        <p>Leftover Rescue connects bakeries, cafés, home gardeners and neighbours with people nearby who can rescue surplus food before it goes to waste.</p>
+        <div class="actions">
+          <button class="btn primary" onclick="scrollToId('browse')">🥕 Find food nearby</button>
+          <button class="btn secondary" onclick="openModal()">📦 List surplus food</button>
+        </div>
+      </div>
+      <div class="hero-card">
+        <h3>How it works</h3>
+        <p class="muted">Three simple steps for a local food rescue.</p>
+        <div class="impact">
+          <div><b>1</b><span>List</span></div>
+          <div><b>2</b><span>Rescue</span></div>
+          <div><b>3</b><span>Enjoy</span></div>
+        </div>
+        <p><strong>Example:</strong> A bakery has 12 bagels left at 5 PM. It lists a mystery bag for ₹80. Someone nearby reserves it and picks it up before closing.</p>
+      </div>
+    </section>
+
+    <section class="section" id="browse">
+      <div class="section-head">
+        <div>
+          <h2>Food near you</h2>
+          <div class="muted">Demo listings — you can add your own below.</div>
+        </div>
+        <button class="btn primary" onclick="openModal()">+ List food</button>
+      </div>
+
+      <div class="filters">
+        <input id="search" placeholder="Search bagels, lemons, bread..." oninput="render()" />
+        <select id="category" onchange="render()">
+          <option value="all">All categories</option>
+          <option>Bakery</option>
+          <option>Garden</option>
+          <option>Produce</option>
+          <option>Meals</option>
+        </select>
+        <select id="priceFilter" onchange="render()">
+          <option value="all">Any price</option>
+          <option value="free">Free</option>
+          <option value="discount">Under ₹100</option>
+        </select>
+      </div>
+      <div class="listings" id="listings"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="inner">
+      <div><strong>Leftover Rescue</strong><br><span>Small rescues. Big impact.</span></div>
+      <div>Prototype built for local food sharing.</div>
+    </div>
+  </footer>
+</div>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div><h2 style="margin:0">List surplus food</h2><div class="muted">Add something your neighbourhood can rescue.</div></div>
+      <button class="close" onclick="closeModal()">✕</button>
+    </div>
+    <form id="listingForm">
+      <div class="two">
+        <div><label>Food name</label><input id="foodName" required placeholder="e.g. Fresh lemons" /></div>
+        <div><label>Category</label><select id="foodCategory"><option>Bakery</option><option>Garden</option><option>Produce</option><option>Meals</option></select></div>
+      </div>
+      <div class="two">
+        <div><label>Price (₹)</label><input id="foodPrice" type="number" min="0" required placeholder="0 for free" /></div>
+        <div><label>Original value (₹)</label><input id="foodOldPrice" type="number" min="0" placeholder="Optional" /></div>
+      </div>
+      <div class="two">
+        <div><label>Available quantity</label><input id="foodQty" required placeholder="e.g. 2 boxes" /></div>
+        <div><label>Pickup time</label><input id="foodTime" required placeholder="e.g. Today, 6–8 PM" /></div>
+      </div>
+      <div><label>Pickup area</label><input id="foodArea" required placeholder="e.g. 1 km away • Anna Nagar" /></div>
+      <div><label>Short description</label><textarea id="foodDescription" placeholder="Tell people what they are rescuing..."></textarea></div>
+      <button class="btn primary" type="submit">Publish listing</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const demoListings = [
+  {id:1,name:"Mystery Bag of Bagels",category:"Bakery",price:80,oldPrice:180,qty:"1 bag",time:"Today, 5–7 PM",area:"0.6 km • Anna Nagar",emoji:"🥯",description:"A mixed bag of today's fresh bagels."},
+  {id:2,name:"Garden Fresh Lemons",category:"Garden",price:0,oldPrice:80,qty:"1 box",time:"Today, 4–8 PM",area:"0.9 km • Shenoy Nagar",emoji:"🍋",description:"Extra lemons from a home garden. Free for pickup."},
+  {id:3,name:"Fresh Bread Loaves",category:"Bakery",price:60,oldPrice:140,qty:"3 loaves",time:"Today, 6–8 PM",area:"1.2 km • Kilpauk",emoji:"🍞",description:"Perfectly good bread from today's bakery batch."},
+  {id:4,name:"Homegrown Tomatoes",category:"Produce",price:40,oldPrice:100,qty:"1 kg",time:"Tomorrow, 8–10 AM",area:"1.5 km • Aminjikarai",emoji:"🍅",description:"Extra tomatoes from a neighbour's garden."},
+  {id:5,name:"Vegetable Rice Boxes",category:"Meals",price:70,oldPrice:150,qty:"2 boxes",time:"Today, 8–9 PM",area:"1.8 km • Chetpet",emoji:"🍱",description:"Fresh surplus dinner portions, packed for pickup."}
+];
+
+let listings = JSON.parse(localStorage.getItem("leftoverRescueListings") || "null") || demoListings;
+
+function save(){ localStorage.setItem("leftoverRescueListings", JSON.stringify(listings)); }
+function scrollToId(id){ document.getElementById(id).scrollIntoView({behavior:"smooth"}); }
+function openModal(){ document.getElementById("modal").classList.add("open"); document.getElementById("foodName").focus(); }
+function closeModal(){ document.getElementById("modal").classList.remove("open"); }
+function toast(msg){ const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); setTimeout(()=>el.classList.remove("show"),2600); }
+
+function render(){
+  const q=document.getElementById("search").value.toLowerCase().trim();
+  const cat=document.getElementById("category").value;
+  const pf=document.getElementById("priceFilter").value;
+  const filtered=listings.filter(x =>
+    (!q || `${x.name} ${x.category} ${x.area} ${x.description}`.toLowerCase().includes(q)) &&
+    (cat==="all" || x.category===cat) &&
+    (pf==="all" || (pf==="free" ? x.price===0 : x.price<100))
+  );
+  const root=document.getElementById("listings");
+  if(!filtered.length){ root.innerHTML='<div class="empty">No rescue matches found. Try another search or list some surplus food.</div>'; return; }
+  root.innerHTML=filtered.map(x=>`
+    <article class="card">
+      <div class="card-top"><div class="emoji">${x.emoji || "🥬"}</div><span class="tag">${x.category}</span></div>
+      <h3>${escapeHtml(x.name)}</h3>
+      <div><span class="price">${x.price===0?"FREE":"₹"+x.price}</span>${x.oldPrice?`<span class="old">₹${x.oldPrice}</span>`:""}</div>
+      <div class="meta"><span>📦 ${escapeHtml(x.qty)}</span><span>📍 ${escapeHtml(x.area)}</span><span>⏰ ${escapeHtml(x.time)}</span></div>
+      <p class="muted">${escapeHtml(x.description || "Surplus food available for local rescue.")}</p>
+      <button class="btn primary claim" onclick="claim(${x.id})">Rescue this food</button>
+    </article>`).join("");
+}
+function claim(id){
+  const item=listings.find(x=>x.id===id);
+  if(!item) return;
+  toast(`Reserved "${item.name}". Pickup details would appear here in the full app.`);
+}
+function escapeHtml(v){ return String(v ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+
+document.getElementById("listingForm").addEventListener("submit", e=>{
+  e.preventDefault();
+  const name=document.getElementById("foodName").value.trim();
+  const price=Number(document.getElementById("foodPrice").value || 0);
+  const oldPrice=Number(document.getElementById("foodOldPrice").value || 0);
+  listings.unshift({
+    id:Date.now(), name, category:document.getElementById("foodCategory").value,
+    price, oldPrice, qty:document.getElementById("foodQty").value.trim(),
+    time:document.getElementById("foodTime").value.trim(),
+    area:document.getElementById("foodArea").value.trim(),
+    emoji:{Bakery:"🥯",Garden:"🍋",Produce:"🍅",Meals:"🍱"}[document.getElementById("foodCategory").value],
+    description:document.getElementById("foodDescription").value.trim()
+  });
+  save(); e.target.reset(); closeModal(); render(); scrollToId("browse"); toast("Your food rescue listing is live!");
+});
+document.getElementById("modal").addEventListener("click", e=>{if(e.target.id==="modal") closeModal();});
+render();
+</script>
+</body>
+</html>
